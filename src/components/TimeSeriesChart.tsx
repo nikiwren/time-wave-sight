@@ -78,20 +78,24 @@ export const TimeSeriesChart = ({ data, isLoading }: TimeSeriesChartProps) => {
           <XAxis 
             dataKey="timestamp_id" 
             tickFormatter={(timestampId, index) => {
-              // Find the corresponding data point to get the date
+              // Always show timestamp_id, and show date context when useful
               const dataPoint = data.find(d => d.timestamp_id === timestampId);
-              if (!dataPoint) return timestampId;
+              if (!dataPoint) return `#${timestampId}`;
               
-              // Show dates by default, timestamp_ids when there are fewer than 20 data points (zoomed in)
-              if (data.length <= 20) {
+              // For dense data, show only timestamp_id
+              if (data.length > 30) {
                 return `#${timestampId}`;
               } else {
-                return format(parseISO(dataPoint.date), 'MMM dd');
+                // For less dense data, show both
+                return `#${timestampId}\n${format(parseISO(dataPoint.date), 'MMM dd')}`;
               }
             }}
             stroke="hsl(var(--muted-foreground))"
-            fontSize={12}
-            interval="preserveStartEnd"
+            fontSize={10}
+            interval={0}
+            angle={-45}
+            textAnchor="end"
+            height={60}
           />
           <YAxis 
             tickFormatter={(value) => `$${value}`}
@@ -105,14 +109,8 @@ export const TimeSeriesChart = ({ data, isLoading }: TimeSeriesChartProps) => {
             stroke="hsl(var(--chart-primary))"
             strokeWidth={2}
             fill="url(#priceGradient)"
-          />
-          <Line
-            type="monotone"
-            dataKey="price"
-            stroke="hsl(var(--chart-primary))"
-            strokeWidth={2}
-            dot={false}
-            activeDot={{ r: 4, fill: "hsl(var(--chart-primary))" }}
+            dot={{ r: 3, fill: "hsl(var(--chart-primary))" }}
+            activeDot={{ r: 5, fill: "hsl(var(--chart-primary))" }}
           />
         </AreaChart>
       </ResponsiveContainer>
