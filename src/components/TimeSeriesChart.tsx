@@ -77,9 +77,21 @@ export const TimeSeriesChart = ({ data, isLoading }: TimeSeriesChartProps) => {
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--chart-grid))" />
           <XAxis 
             dataKey="timestamp_id" 
-            tickFormatter={(value) => `#${value}`}
+            tickFormatter={(timestampId, index) => {
+              // Find the corresponding data point to get the date
+              const dataPoint = data.find(d => d.timestamp_id === timestampId);
+              if (!dataPoint) return timestampId;
+              
+              // Show dates by default, timestamp_ids when there are fewer than 20 data points (zoomed in)
+              if (data.length <= 20) {
+                return `#${timestampId}`;
+              } else {
+                return format(parseISO(dataPoint.date), 'MMM dd');
+              }
+            }}
             stroke="hsl(var(--muted-foreground))"
             fontSize={12}
+            interval="preserveStartEnd"
           />
           <YAxis 
             tickFormatter={(value) => `$${value}`}
