@@ -1,9 +1,18 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { format, parseISO } from 'date-fns';
 
+export interface BackendDataPoint {
+  timestamp_id: string;
+  date: string;
+  price: number;
+  sensitivity: string;
+  rmpid: string;
+}
+
 export interface TimeSeriesDataPoint {
   date: string;
   price: number;
+  timestamp_id: string;
 }
 
 interface TimeSeriesChartProps {
@@ -13,6 +22,7 @@ interface TimeSeriesChartProps {
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
+    const data = payload[0].payload;
     return (
       <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
         <p className="text-sm font-medium text-card-foreground">
@@ -20,6 +30,9 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         </p>
         <p className="text-sm text-chart-primary">
           Price: <span className="font-semibold">${payload[0].value.toFixed(2)}</span>
+        </p>
+        <p className="text-xs text-muted-foreground">
+          ID: <span className="font-medium">{data.timestamp_id}</span>
         </p>
       </div>
     );

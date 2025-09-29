@@ -1,12 +1,24 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TimeSeriesChart, type TimeSeriesDataPoint } from './TimeSeriesChart';
+import { TimeSeriesChart, type TimeSeriesDataPoint, type BackendDataPoint } from './TimeSeriesChart';
 import { TimePeriodSelector, type TimePeriod } from './TimePeriodSelector';
 import { DateRangePicker } from './DateRangePicker';
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, TrendingDown, Calendar, DollarSign } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
 import { addDays, eachDayOfInterval, eachWeekOfInterval, eachMonthOfInterval, format, startOfWeek, startOfMonth } from 'date-fns';
+
+// Process backend data: filter positive prices, sort by timestamp_id
+const processBackendData = (backendData: BackendDataPoint[]): TimeSeriesDataPoint[] => {
+  return backendData
+    .filter(item => item.price > 0) // Only positive prices
+    .sort((a, b) => parseInt(a.timestamp_id) - parseInt(b.timestamp_id)) // Sort by timestamp_id ascending
+    .map(item => ({
+      date: item.date,
+      price: item.price,
+      timestamp_id: item.timestamp_id
+    }));
+};
 
 // Mock data generator - replace with actual API calls
 const generateMockData = (period: TimePeriod, dateRange?: DateRange): TimeSeriesDataPoint[] => {
@@ -31,7 +43,8 @@ const generateMockData = (period: TimePeriod, dateRange?: DateRange): TimeSeries
       
       data.push({
         date: date.toISOString(),
-        price: Math.max(price, 100)
+        price: Math.max(price, 100),
+        timestamp_id: (i + 1).toString()
       });
     }
     return data;
@@ -54,7 +67,8 @@ const generateMockData = (period: TimePeriod, dateRange?: DateRange): TimeSeries
     
     data.push({
       date: date.toISOString(),
-      price: Math.max(price, 100)
+      price: Math.max(price, 100),
+      timestamp_id: (i + 1).toString()
     });
   });
 
