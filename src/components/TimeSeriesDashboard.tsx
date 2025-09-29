@@ -8,32 +8,16 @@ import { TrendingUp, TrendingDown, Calendar, DollarSign } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
 import { addDays, eachDayOfInterval, eachWeekOfInterval, eachMonthOfInterval, format, startOfWeek, startOfMonth } from 'date-fns';
 
-// Process backend data: filter positive prices, sort by timestamp_id, handle duplicate dates
+// Process backend data: filter positive prices, sort by timestamp_id
 const processBackendData = (backendData: BackendDataPoint[]): TimeSeriesDataPoint[] => {
-  const filteredData = backendData
+  return backendData
     .filter(item => item.price > 0) // Only positive prices
-    .sort((a, b) => parseInt(a.timestamp_id) - parseInt(b.timestamp_id)); // Sort by timestamp_id ascending
-  
-  // Group by date and keep only the latest timestamp_id for each date
-  const dateMap = new Map<string, TimeSeriesDataPoint>();
-  
-  filteredData.forEach(item => {
-    const existingItem = dateMap.get(item.date);
-    
-    // If no existing item for this date, or current item has higher timestamp_id, keep it
-    if (!existingItem || parseInt(item.timestamp_id) > parseInt(existingItem.timestamp_id)) {
-      dateMap.set(item.date, {
-        date: item.date,
-        price: item.price,
-        timestamp_id: item.timestamp_id
-      });
-    }
-  });
-  
-  // Convert back to array and sort by date
-  return Array.from(dateMap.values()).sort((a, b) => 
-    new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
+    .sort((a, b) => parseInt(a.timestamp_id) - parseInt(b.timestamp_id)) // Sort by timestamp_id ascending
+    .map(item => ({
+      date: item.date,
+      price: item.price,
+      timestamp_id: item.timestamp_id
+    }));
 };
 
 // Mock data generator - replace with actual API calls
@@ -185,9 +169,9 @@ export const TimeSeriesDashboard = () => {
       {/* Chart */}
       <Card className="bg-card border-border">
         <CardHeader>
-          <CardTitle className="text-card-foreground">Price Chart</CardTitle>
+          <CardTitle className="text-card-foreground">Price Chart by Timestamp ID</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Historical price data for the selected time period
+            Price data plotted against timestamp IDs for the selected time period
           </p>
         </CardHeader>
         <CardContent>

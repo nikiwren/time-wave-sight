@@ -26,13 +26,13 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     return (
       <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
         <p className="text-sm font-medium text-card-foreground">
-          {format(parseISO(label), 'MMM dd, yyyy')}
+          Timestamp ID: <span className="font-bold">{label}</span>
         </p>
         <p className="text-sm text-chart-primary">
           Price: <span className="font-semibold">${payload[0].value.toFixed(2)}</span>
         </p>
         <p className="text-xs text-muted-foreground">
-          ID: <span className="font-medium">{data.timestamp_id}</span>
+          Date: <span className="font-medium">{format(parseISO(data.date), 'MMM dd, yyyy')}</span>
         </p>
       </div>
     );
@@ -76,8 +76,8 @@ export const TimeSeriesChart = ({ data, isLoading }: TimeSeriesChartProps) => {
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--chart-grid))" />
           <XAxis 
-            dataKey="date" 
-            tickFormatter={(value) => format(parseISO(value), 'MMM dd')}
+            dataKey="timestamp_id" 
+            tickFormatter={(value) => `#${value}`}
             stroke="hsl(var(--muted-foreground))"
             fontSize={12}
           />
